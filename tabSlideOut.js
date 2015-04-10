@@ -19,11 +19,12 @@
             pathToTabImage: null,
             imageHeight: null,
             imageWidth: null,
-            onLoadSlideOut: false            
+            onLoadSlideOut: false,
+            onSlideOut: function() {},
+            onSlideIn:  function() {}          
         }, callerSettings||{});
 
         settings.tabHandle = $(settings.tabHandle);
-        
         var obj = this;
         if (settings.fixedPosition === true) {
             settings.positioning = 'fixed';
@@ -71,17 +72,17 @@
         //set calculated css
         if(settings.tabLocation === 'top' || settings.tabLocation === 'bottom') {
             obj.css({'left' : settings.leftPos});
-            settings.tabHandle.css({'right' : 0});
+            settings.tabHandle.parent().css({'right' : 0});
         }
         
         if(settings.tabLocation === 'top') {
             obj.css({'top' : '-' + properties.containerHeight});
-            settings.tabHandle.css({'bottom' : '-' + properties.tabHeight});
+            settings.tabHandle.parent().css({'bottom' : '-' + properties.tabHeight});
         }
 
         if(settings.tabLocation === 'bottom') {
             obj.css({'bottom' : '-' + properties.containerHeight, 'position' : 'fixed'});
-            settings.tabHandle.css({'top' : '-' + properties.tabHeight});
+            settings.tabHandle.parent().css({'top' : '-' + properties.tabHeight});
             
         }
         
@@ -90,18 +91,18 @@
                 'height' : properties.containerHeight,
                 'top' : settings.topPos
             });
-
-            settings.tabHandle.css({ 'top': (obj.outerHeight() - Math.abs(settings.imageHeight.replace('px', ''))) / 2 });
+            
+            settings.tabHandle.parent().css({'top' : 0});
         }
         
         if(settings.tabLocation === 'left') {
             obj.css({ 'left': '-' + properties.containerWidth});
-            settings.tabHandle.css({'right' : '-' + properties.tabWidth});
+            settings.tabHandle.parent().css({'right' : '-' + properties.tabWidth});
         }
 
         if(settings.tabLocation === 'right') {
             obj.css({ 'right': '-' + properties.containerWidth});
-            settings.tabHandle.css({'left' : '-' + properties.tabWidth});
+            settings.tabHandle.parent().css({'left' : '-' + properties.tabWidth});
             
             $('html').css('overflow-x', 'hidden');
         }
@@ -115,13 +116,13 @@
         var slideIn = function() {
             
             if (settings.tabLocation === 'top') {
-                obj.animate({top:'-' + properties.containerHeight}, settings.speed).removeClass('open');
+                obj.animate({top:'-' + properties.containerHeight}, settings.speed,settings.onSlideIn).removeClass('open');
             } else if (settings.tabLocation === 'left') {
-                obj.animate({left: '-' + properties.containerWidth}, settings.speed).removeClass('open');
+                obj.animate({left: '-' + properties.containerWidth}, settings.speed,settings.onSlideIn).removeClass('open');
             } else if (settings.tabLocation === 'right') {
-                obj.animate({right: '-' + properties.containerWidth}, settings.speed).removeClass('open');
+                obj.animate({right: '-' + properties.containerWidth}, settings.speed,settings.onSlideIn).removeClass('open');
             } else if (settings.tabLocation === 'bottom') {
-                obj.animate({bottom: '-' + properties.containerHeight}, settings.speed).removeClass('open');
+                obj.animate({bottom: '-' + properties.containerHeight}, settings.speed,settings.onSlideIn).removeClass('open');
             }    
             
         };
@@ -129,13 +130,13 @@
         var slideOut = function() {
             
             if (settings.tabLocation == 'top') {
-                obj.animate({top:'-3px'},  settings.speed).addClass('open');
+                obj.animate({top:'-3px'},  settings.speed,settings.onSlideOut).addClass('open');
             } else if (settings.tabLocation == 'left') {
-                obj.animate({left:'-3px'},  settings.speed).addClass('open');
+                obj.animate({left:'-3px'},  settings.speed,settings.onSlideOut).addClass('open');
             } else if (settings.tabLocation == 'right') {
-                obj.animate({right:'-3px'},  settings.speed).addClass('open');
+                obj.animate({right:'-3px'},  settings.speed,settings.onSlideOut).addClass('open');
             } else if (settings.tabLocation == 'bottom') {
-                obj.animate({bottom:'-3px'},  settings.speed).addClass('open');
+                obj.animate({bottom:'-3px'},  settings.speed,settings.onSlideOut).addClass('open');
             }
         };
 
@@ -143,7 +144,7 @@
             obj.click(function(event){
                 event.stopPropagation();
             });
-            
+
             $(document).click(function(){
                 slideIn();
             });
@@ -158,8 +159,7 @@
                 }
             });
             
-            //may want to add option to do this in the future
-            //clickScreenToClose();
+            /*clickScreenToClose();*/
         };
         
         var hoverAction = function(){
@@ -188,7 +188,7 @@
         
         //choose which type of action to bind
         if (settings.action === 'click') {
-            clickAction();
+             clickAction();
         }
         
         if (settings.action === 'hover') {
